@@ -171,6 +171,7 @@ render state@{ ac, accDisplay, gn } =
                             , P.selected $ n == getNote state
                             ]
                             [ H.text $ Note.display state.accDisplay n ]
+                , H.text " "
                 , numberInput
                     { label: ""
                     , min: Just 0.0
