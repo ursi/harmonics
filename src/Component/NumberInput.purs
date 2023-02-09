@@ -1,4 +1,4 @@
-module NumberInput where
+module Component.NumberInput where
 
 import Lude
 import Effect.Aff as Aff

@@ -1,4 +1,4 @@
-module Audio (Slot, noiseMaker) where
+module Component.SoundButton (Slot, soundButton) where
 
 import Lude hiding (round)
 
@@ -28,8 +28,8 @@ type InputRow =
 
 type Input = { | InputRow }
 
-noiseMaker :: ∀ q o m. MonadEffect m => Component q Input o m
-noiseMaker =
+soundButton :: ∀ q o m. MonadEffect m => Component q Input o m
+soundButton =
   Hal.mkComponent
     { initialState: Record.merge { oscillator: Nothing }
     , render

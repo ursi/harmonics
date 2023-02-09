@@ -7,8 +7,8 @@ import Audio.AudioContext as AudioContext
 import Audio.GainNode (GainNode)
 import Audio.GainNode as GainNode
 import Audio.Oscillator (Frequency)
-import Audio as Audio
-import NumberInput as NumberInput
+import Component.NumberInput as NumberInput
+import Component.SoundButton as SoundButton
 import Data.Array ((..))
 -- import Debug as Debug
 import DOM.HTML.Indexed (HTMLinput)
@@ -80,7 +80,7 @@ main = do
     runUI parent unit body
 
 type Slots =
-  ( noiseMaker :: Audio.Slot
+  ( noiseMaker :: SoundButton.Slot
   , numberInput :: NumberInput.Slot
   )
 
@@ -205,7 +205,7 @@ render state@{ ac, accDisplay, gn } =
       H.slot_
         (Proxy :: _ "noiseMaker")
         freq
-        Audio.noiseMaker
+        SoundButton.soundButton
         { ac, accDisplay, freq, gn, harmonic }
 
     numberInput ::
