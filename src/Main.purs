@@ -97,7 +97,11 @@ handleAction action = do
     SetUpper f -> Hal.modify_ _ { bounds = fst state.bounds /\ f }
     SetFreqMode value ->
       case value of
-        "Notes" -> Hal.modify_ _ { freqMode = Notes }
+        "Notes" ->
+          Hal.modify_
+            _ { freqMode = Notes
+              , frequency = Right $ getNote state /\ getOctave state
+              }
         "Manual" -> Hal.modify_ _ { freqMode = Manual }
         _ -> pure unit
     SetNote str ->
