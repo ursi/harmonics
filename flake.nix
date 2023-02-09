@@ -25,7 +25,7 @@
                      record
                      safe-coerce
                      transformers
-                     unsafe-partial
+                     partial
                      ursi.prelude
                      web-events
                      web-html
