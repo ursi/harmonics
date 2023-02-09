@@ -1,42 +1,15 @@
 module NumberInput where
 
-import MasonPrelude
-import Effect.Aff (Aff, forkAff)
+import Lude
 import Effect.Aff as Aff
-import Effect.Aff.Class (class MonadAff, liftAff)
-import Control.Monad.Reader (class MonadAsk, ReaderT, runReaderT, ask)
-import Control.Monad.Trans.Class (lift)
-import Data.Nullable (Nullable)
-import Data.Nullable as Nullable
-import Data.Number as Number
 import Data.Time.Duration (Milliseconds(..))
-import Debug as Debug
-import Halogen
-  (AttrName(..)
-  , Component
-  , ComponentHTML
-  , ElemName(..)
-  , HalogenM
-  , SubscriptionId
-  )
 import Halogen as Hal
-import Halogen.Aff as HA
-import Halogen.VDom.Driver (runUI)
-import Halogen.HTML (Leaf, HTML)
 import Halogen.HTML as H
 import Halogen.HTML.Events as E
-import Halogen.HTML.Properties (IProp)
 import Halogen.HTML.Properties as P
 import Halogen.Subscription (Emitter)
 import Halogen.Subscription as Sub
 import Record as Record
-import Web.Event.Event as Event
-import Web.Event.Event (Event)
-import Web.DOM.Element as Element
-import Web.HTML.HTMLElement (HTMLElement)
-import Web.HTML.HTMLElement as HTMLElement
-import Web.HTML.HTMLInputElement (HTMLInputElement)
-import Web.HTML.HTMLInputElement as Input
 
 type Output = Number
 
@@ -109,9 +82,10 @@ handleAction action = do
 render :: ∀ m. State -> ComponentHTML Action () m
 render state =
   H.label_
-    [ H.text $ state.label <> ": "
+    [ H.text $ if state.label == "" then "" else state.label <> ": "
     , H.input
-        [ P.style
+        [ class' "c3c"
+        , P.style
             case stringToNumber state.valueString of
               Just n | between' state.min state.max n -> ""
               _ | state.valueString == ""
@@ -136,9 +110,3 @@ setTimer ms action = do
     Aff.delay $ Milliseconds ms
     liftEffect $ Sub.notify listener action
   pure emitter
-
-foreign import numberToString :: Number -> String
-foreign import stringToNumberImpl :: String -> Nullable Number
-
-stringToNumber :: String -> Maybe Number
-stringToNumber = Nullable.toMaybe <. stringToNumberImpl

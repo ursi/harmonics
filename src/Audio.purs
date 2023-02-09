@@ -1,15 +1,18 @@
 module Audio (Slot, noiseMaker) where
 
-import MasonPrelude
+import Lude hiding (round)
 
 import Audio.AudioContext (AudioContext)
 import Audio.GainNode (GainNode)
 import Audio.Oscillator (Frequency, Oscillator)
 import Audio.Oscillator as Oscillator
-import Halogen (Component, ComponentHTML, HalogenM)
+import Data.Number as Number
 import Halogen as Hal
 import Halogen.HTML as H
+import Halogen.HTML.Properties as P
 import Halogen.HTML.Events as E
+import Note (AccDisplay)
+import Note as Note
 import Record as Record
 import Web.UIEvent.MouseEvent as MouseEvent
 
@@ -20,6 +23,7 @@ type InputRow =
   , freq :: Frequency
   , gn :: GainNode
   , harmonic :: Int
+  , accDisplay :: AccDisplay
   )
 
 type Input = { | InputRow }
@@ -29,7 +33,12 @@ noiseMaker =
   Hal.mkComponent
     { initialState: Record.merge { oscillator: Nothing }
     , render
-    , eval: Hal.mkEval $ Hal.defaultEval { handleAction = handleAction }
+    , eval:
+        Hal.mkEval
+        $ Hal.defaultEval
+            { handleAction = handleAction
+            , receive = Just <. UpdateAccDisplay <. _.accDisplay
+            }
     }
 
 type State =
@@ -40,6 +49,7 @@ type State =
 data Action
   = Start
   | Stop
+  | UpdateAccDisplay AccDisplay
 
 handleAction :: ∀ o m. MonadEffect m => Action -> HalogenM State Action () o m Unit
 handleAction action = do
@@ -54,14 +64,27 @@ handleAction action = do
         Just osc -> liftEffect $ Oscillator.stop osc
         Nothing -> pure unit
 
+    UpdateAccDisplay ad -> Hal.modify_ _ { accDisplay = ad }
+
 render :: ∀ m. State -> ComponentHTML Action () m
-render { freq, harmonic } =
-  H.button
-    [ E.onMouseDown \_ -> Start
+render state =
+  H.div
+    [ class' "c2c"
+    , E.onMouseDown \_ -> Start
     , E.onTouchStart \_ -> Start
     , E.onMouseEnter \e -> if MouseEvent.buttons e == 1 then Start else Stop
     , E.onMouseUp \_ -> Stop
     , E.onTouchEnd \_ -> Stop
     , E.onMouseLeave \_ -> Stop
     ]
-    [ H.text $ show harmonic <> " " <> show freq ]
+    [ vCenter
+      $ H.div_
+          [ H.div [ P.style "font-size: 1.7em;" ] [ H.text $ show state.harmonic ]
+          , H.text
+            $ Note.freqAsSpnStr state.accDisplay state.freq <> "\n"
+              <> numberToString (round 2 state.freq)
+          ]
+    ]
+
+round :: Int -> Number -> Number
+round places n = Number.round (10.0 ^ toNumber places * n) / 10.0 ^ toNumber places

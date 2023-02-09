@@ -1,22 +1,17 @@
 module CustomElements where
 
-import MasonPrelude
-import Effect.Aff (Aff)
-import Data.Nullable (Nullable)
+import Lude
 import Data.Nullable as Nullable
 import Data.Number as Number
 import Debug as Debug
-import Halogen (AttrName(..), Component, ComponentHTML, ElemName(..), HalogenM)
 import Halogen as Hal
 import Halogen.Aff as HA
-import Halogen.VDom.Driver (runUI)
-import Halogen.HTML (Leaf, HTML)
+import Halogen.HTML (Leaf)
 import Halogen.HTML as H
 import Halogen.HTML.Events as E
-import Halogen.HTML.Properties (IProp)
 import Halogen.HTML.Properties as P
 import Halogen.Subscription as Sub
-import Control.Monad.Reader (class MonadAsk, ReaderT, runReaderT, ask)
+import Control.Monad.Reader (ReaderT, runReaderT, ask)
 import Control.Monad.Trans.Class (lift)
 import Web.Event.Event as Event
 import Web.Event.Event (Event)
@@ -145,7 +140,7 @@ type State =
   }
 
 customElement :: ∀ r w i. Leaf r w i
-customElement = H.element (ElemName "custom-element") ~$ []
+customElement = element "custom-element" ~$ []
 
 -- customElement' = H.div [ P.attr (AttrName "is") "custom-element" ] []
 
@@ -160,13 +155,13 @@ render state =
 -- slot :: String -> Array
 
 slotE :: ∀ w i. String -> Array (HTML w i) -> HTML w i
-slotE name = H.element (ElemName "slot") [ P.name name ]
+slotE name = element "slot" [ P.name name ]
 
 slotA :: ∀ r i. String -> IProp r i
-slotA = P.attr (AttrName "slot")
+slotA = attr "slot"
 
 label :: ∀ r i. String -> IProp r i
-label = P.attr (AttrName "label")
+label = attr "label"
 
 getAttribute :: String -> HTMLElement -> Effect (Maybe String)
 getAttribute = Element.getAttribute <~. HTMLElement.toElement

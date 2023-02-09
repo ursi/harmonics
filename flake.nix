@@ -17,12 +17,15 @@
                    with purs-nix.ps-pkgs;
                    [ aff
                      datetime
+                     enums
                      halogen
                      integers
                      nullable
                      numbers
                      record
+                     safe-coerce
                      transformers
+                     unsafe-partial
                      ursi.prelude
                      web-events
                      web-html
@@ -32,7 +35,10 @@
                };
            css = (nix-css ./css.nix).bundle;
          in
-         { packages.default = ps.bundle {};
+         { packages =
+             { inherit css;
+               default = ps.bundle {};
+             };
 
            devShells.default =
              pkgs.mkShell
@@ -48,7 +54,7 @@
 
                  shellHook =
                    ''
-                   alias watch="find src | entr -s 'echo bundling; purs-nix bundle; ln -fs ${css}/main.css .'"
+                   alias watch="ls **/*.{purs,js,nix} | entr -s 'echo bundling; purs-nix bundle; nix build .#css; ln -fs result/main.css .'"
                    '';
                };
          }
