@@ -82,9 +82,9 @@ render state =
           [ H.div [ P.style "font-size: 1.7em;" ] [ H.text $ show state.harmonic ]
           , H.text
             $ Note.freqAsSpnStr state.accDisplay state.freq <> "\n"
-              <> numberToString (round 2 state.freq)
+              <> numberToString (Number.round state.freq)
           ]
     ]
 
-round :: Int -> Number -> Number
-round places n = Number.round (10.0 ^ toNumber places * n) / 10.0 ^ toNumber places
+-- round :: Int -> Number -> Number
+-- round places n = Number.round (10.0 ^ toNumber places * n) / 10.0 ^ toNumber places
