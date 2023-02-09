@@ -93,7 +93,7 @@ render state =
                   || state.valueString == "."
                   || state.valueString == "-."
                   -> ""
-                | otherwise -> "color: #cd0000;"
+                | otherwise -> "color: #a80000;"
         , E.onValueInput Input
         , P.value state.valueString
         , P.placeholder $ numberToString state.value
