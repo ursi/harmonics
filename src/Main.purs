@@ -176,13 +176,14 @@ render state@{ ac, accDisplay, gn } =
                             ]
                             [ H.text $ Note.display state.accDisplay n ]
                 , H.text " "
-                , numberInput
+                , numberInput'
                     { label: ""
                     , min: Just 0.0
                     , max: Nothing
                     , value: toNumber $ getOctave state
                     }
                     (SetOctave <. round)
+                    "octave"
                 ]
         , numberInput
             { label: "Lower Bound"
@@ -217,10 +218,17 @@ render state@{ ac, accDisplay, gn } =
       NumberInput.Input
       -> (NumberInput.Output -> Action)
       -> ComponentHTML Action Slots m
-    numberInput input handle =
+    numberInput input handle = numberInput' input handle input.label
+
+    numberInput' ::
+      NumberInput.Input
+      -> (NumberInput.Output -> Action)
+      -> String
+      -> ComponentHTML Action Slots m
+    numberInput' input handle id =
       H.slot
         (Proxy :: _ "numberInput")
-        input.label
+        id
         NumberInput.numberInput
         input
         handle
