@@ -640,11 +640,11 @@
         "utils": "utils_6"
       },
       "locked": {
-        "lastModified": 1674243319,
-        "narHash": "sha256-o39rBVSNqchahHrMYNixdlasDro8omlf/n7yQZsdNI8=",
+        "lastModified": 1675993222,
+        "narHash": "sha256-CH6+LCiZZFOPGqbFl5r5Mx/KpA/ar8vFIkVdNZPwlCM=",
         "owner": "purs-nix",
         "repo": "purs-nix",
-        "rev": "2b7761ffaded363d0d00afe320350cc5c9ee9012",
+        "rev": "5d0a08d3f708bc5ebd72908a21559733e12fd671",
         "type": "github"
       },
       "original": {
