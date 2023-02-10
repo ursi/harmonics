@@ -13,7 +13,7 @@ module Lude
 
 import MasonPrelude as Exports
 import Data.Enum
-  (class Enum
+  ( class Enum
   , class BoundedEnum
   , cardinality
   , enumFromTo
