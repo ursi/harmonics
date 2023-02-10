@@ -12,6 +12,7 @@ module Lude
 
 
 import MasonPrelude as Exports
+import Control.Monad.Reader (class MonadAsk, ask, runReaderT) as Exports
 import Data.Enum
   ( class Enum
   , class BoundedEnum

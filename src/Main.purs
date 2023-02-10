@@ -2,11 +2,11 @@ module Main where
 
 import Lude
 
-import Audio.AudioContext (AudioContext)
 import Audio.AudioContext as AudioContext
-import Audio.GainNode (GainNode)
+import Audio.GainNode (Volume)
 import Audio.GainNode as GainNode
 import Audio.Oscillator (Frequency)
+import Config (AppM)
 import Component.NumberInput as NumberInput
 import Component.SoundButton as SoundButton
 import Data.Array ((..))
@@ -21,9 +21,7 @@ import Note (AccDisplay, Note (..), Spn)
 import Note as Note
 
 type State =
-  { ac :: AudioContext
-  , gn :: GainNode
-  , frequency :: NoteFreq
+  { frequency :: NoteFreq
   , bounds :: Frequency /\ Frequency
   , volume :: Number
   , accDisplay :: AccDisplay
@@ -56,40 +54,42 @@ nf2f =
 main :: Effect Unit
 main = do
   let initialVolume = 50.0
-  ac <- AudioContext.create
-  gn <- GainNode.create initialVolume ac
-  let
-    parent :: ∀ q i m. MonadAff m => Component q i Void m
-    parent =
-      Hal.mkComponent
-        { initialState: const
-            { ac
-            , bounds: 500.0 /\ 3000.0
-            , gn
-            , frequency: Right $ G /\ 2
-            , freqMode: Notes
-            , volume: initialVolume
-            , accDisplay: Note.Sharp
-            }
-        , render
-        , eval: Hal.mkEval $ Hal.defaultEval { handleAction = handleAction }
-        }
-
+  audioContext <- AudioContext.create
+  gainNode <- GainNode.create initialVolume audioContext
   HA.runHalogenAff do
     body <- HA.awaitBody
-    runUI parent unit body
+    runUI
+      (Hal.hoist (runReaderT ~$ { audioContext, gainNode })
+       $ parent initialVolume
+      )
+      unit body
 
 type Slots =
   ( noiseMaker :: SoundButton.Slot
   , numberInput :: NumberInput.Slot
   )
 
-handleAction :: ∀ o m. MonadAff m => Action -> HalogenM State Action Slots o m Unit
+parent :: ∀ q i. Volume -> Component q i Void AppM
+parent volume =
+  Hal.mkComponent
+    { initialState: const
+        { bounds: 466.0 /\ 3000.0
+        , frequency: Right $ G /\ 2
+        , freqMode: Notes
+        , volume
+        , accDisplay: Note.Sharp
+        }
+    , render
+    , eval: Hal.mkEval $ Hal.defaultEval { handleAction = handleAction }
+    }
+
+handleAction :: ∀ o. Action -> HalogenM State Action Slots o AppM Unit
 handleAction action = do
   state <- Hal.get
   case action of
     SetVolume n -> do
-      liftEffect $ GainNode.setVolume n state.gn
+      { gainNode } <- ask
+      liftEffect $ GainNode.setVolume n gainNode
       Hal.modify_ _ { volume = n }
 
     SetFrequency f -> Hal.modify_ _ { frequency = Left f }
@@ -123,8 +123,8 @@ handleAction action = do
     NOP -> pure unit
 
 
-render :: ∀ m. MonadAff m => State -> ComponentHTML Action Slots m
-render state@{ ac, accDisplay, gn } =
+render :: State -> ComponentHTML Action Slots AppM
+render state@{ accDisplay } =
   let
     lower :: Frequency
     lower = fst state.bounds
@@ -206,25 +206,25 @@ render state@{ ac, accDisplay, gn } =
               .. floor (upper / nf2f state.frequency)
     ]
   where
-    noiseMaker :: Int -> Frequency -> ComponentHTML Action Slots m
+    noiseMaker :: Int -> Frequency -> ComponentHTML Action Slots AppM
     noiseMaker harmonic freq =
       H.slot_
         (Proxy :: _ "noiseMaker")
         freq
         SoundButton.soundButton
-        { ac, accDisplay, freq, gn, harmonic }
+        { accDisplay, freq, harmonic }
 
     numberInput ::
       NumberInput.Input
       -> (NumberInput.Output -> Action)
-      -> ComponentHTML Action Slots m
+      -> ComponentHTML Action Slots AppM
     numberInput input handle = numberInput' input handle input.label
 
     numberInput' ::
       NumberInput.Input
       -> (NumberInput.Output -> Action)
       -> String
-      -> ComponentHTML Action Slots m
+      -> ComponentHTML Action Slots AppM
     numberInput' input handle id =
       H.slot
         (Proxy :: _ "numberInput")

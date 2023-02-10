@@ -2,10 +2,9 @@ module Component.SoundButton (Slot, soundButton) where
 
 import Lude hiding (round)
 
-import Audio.AudioContext (AudioContext)
-import Audio.GainNode (GainNode)
 import Audio.Oscillator (Frequency, Oscillator)
 import Audio.Oscillator as Oscillator
+import Config (Config)
 import Data.Number as Number
 import Halogen as Hal
 import Halogen.HTML as H
@@ -19,16 +18,14 @@ import Web.UIEvent.MouseEvent as MouseEvent
 type Slot = ∀ q o. Hal.Slot q o Number
 
 type InputRow =
-  ( ac :: AudioContext
-  , freq :: Frequency
-  , gn :: GainNode
+  ( freq :: Frequency
   , harmonic :: Int
   , accDisplay :: AccDisplay
   )
 
 type Input = { | InputRow }
 
-soundButton :: ∀ q o m. MonadEffect m => Component q Input o m
+soundButton :: ∀ q o m. MonadAsk Config m => MonadEffect m => Component q Input o m
 soundButton =
   Hal.mkComponent
     { initialState: Record.merge { oscillator: Nothing }
@@ -51,12 +48,22 @@ data Action
   | Stop
   | UpdateAccDisplay AccDisplay
 
-handleAction :: ∀ o m. MonadEffect m => Action -> HalogenM State Action () o m Unit
+handleAction :: ∀ o m.
+  MonadAsk Config m =>
+  MonadEffect m
+  => Action
+  -> HalogenM State Action () o m Unit
 handleAction action = do
+  config <- ask
   state <- Hal.get
   case action of
     Start -> do
-      osc <- liftEffect $ Oscillator.start state.freq state.gn state.ac
+      osc <-
+        liftEffect
+        $ Oscillator.start
+            state.freq
+            config.gainNode
+            config.audioContext
       Hal.modify_ \s -> s { oscillator = Just osc }
 
     Stop ->
