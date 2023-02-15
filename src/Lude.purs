@@ -3,6 +3,8 @@ module Lude
   , attr
   , class'
   , element
+  , handler
+  , handler'
   , modToEnum
   , numberToString
   , stringToNumber
@@ -36,9 +38,11 @@ import Data.Nullable as Nullable
 import Halogen (AttrName(..), ClassName(..), ComponentHTML,  ElemName(..))
 import Halogen.HTML (HTML)
 import Halogen.HTML as H
+import Halogen.HTML.Events as E
 import Halogen.HTML.Properties (IProp)
 import Halogen.HTML.Properties as P
 import Partial.Unsafe (unsafePartial)
+import Web.Event.Event (Event, EventType(..))
 
 foreign import numberToString :: Number -> String
 foreign import stringToNumberImpl :: String -> Nullable Number
@@ -61,3 +65,9 @@ modToEnum i = unsafePartial $ fromJust $ toEnum $ mod i $ coerce (cardinality ::
 vCenter :: ∀ a s m. ComponentHTML a s m -> ComponentHTML a s m
 vCenter child =
   H.div [ class' "center" ] [ child ]
+
+handler :: ∀ r i. String -> (Event -> i) -> IProp r i
+handler = E.handler <. EventType
+
+handler' :: ∀ r i. String -> (Event -> Maybe i) -> IProp r i
+handler' = E.handler' <. EventType
