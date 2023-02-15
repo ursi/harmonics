@@ -11,7 +11,6 @@ import Component.NumberInput as NumberInput
 import Component.SoundButton as SoundButton
 import Data.Array ((..))
 -- import Debug as Debug
-import DOM.HTML.Indexed (HTMLinput)
 import Halogen as Hal
 import Halogen.Aff as HA
 import Halogen.HTML as H
@@ -126,7 +125,7 @@ handleAction action = do
 
 
 render :: State -> Html
-render state@{ accDisplay } =
+render state =
   let
     lower :: Frequency
     lower = fst state.bounds
@@ -135,78 +134,16 @@ render state@{ accDisplay } =
     upper = snd state.bounds
   in
   H.div [ class' "c5c" ]
-    [ H.div [ class' "c4c" ]
-        [ numberInput
-            { label: "Volume"
-            , min: Just 0.0
-            , max: Just 1000.0
-            , value: state.volume
-            }
-            SetVolume
-        , H.select [ E.onValueInput SetAccDisplay, P.style "width: fit-content;" ]
-            [ H.option [ P.selected $ state.accDisplay == Note.Sharp ]
-                [ H.text "Sharps" ]
-            , H.option [ P.selected $ state.accDisplay == Note.Flat ]
-                [ H.text "Flats" ]
-            , H.option [ P.selected $ state.accDisplay == Note.Both ]
-                [ H.text "Both" ]
-            ]
-        , H.div_
-            [ H.label [ P.for "freq-type" ] [ H.text "Frequency Type: " ]
-            , H.select [ P.id "freq-type", E.onValueInput SetFreqMode ]
-                [ H.option_ [ H.text "Notes" ]
-                , H.option_ [ H.text "Manual" ]
-                ]
-            ]
-        , case state.freqMode of
-            Manual ->
-              numberInput
-                { label: "Base Frequency"
-                , min: Just 10.0
-                , max: Nothing
-                , value: nf2f state.frequency
-                }
-                SetFrequency
-            Notes ->
-              H.div_
-                [ H.select [ P.id "note-picker", E.onValueInput SetNote ]
-                  $ enumFromTo Note.C Note.B
-                    <#> \n ->
-                          H.option
-                            [ P.value $ show n
-                            , P.selected $ n == getNote state
-                            ]
-                            [ H.text $ Note.display state.accDisplay n ]
-                , H.text " "
-                , numberInput'
-                    { label: ""
-                    , min: Just 0.0
-                    , max: Nothing
-                    , value: toNumber $ getOctave state
-                    }
-                    (SetOctave <. round)
-                    "octave"
-                ]
-        , numberInput
-            { label: "Lower Bound"
-            , min: Just 0.0
-            , max: Nothing
-            , value: lower
-            }
-            SetLower
-        , numberInput
-            { label: "Upper Bound"
-            , min: Just 0.0
-            , max: Nothing
-            , value: upper
-            }
-            SetUpper
-        ]
-    , H.div [ class' "c1c" ]
-        $ (\harmonic -> noiseMaker harmonic (toNumber harmonic * nf2f state.frequency))
-          <$> max 1 (ceil (lower / nf2f state.frequency))
-              .. floor (upper / nf2f state.frequency)
+    [ sidebar { state, upper, lower }
+    , harmonicsPanel { state, upper, lower }
     ]
+
+harmonicsPanel :: { state :: State, upper :: Number, lower :: Number } -> Html
+harmonicsPanel { state, upper, lower } =
+  H.div [ class' "c1c" ]
+    $ (\harmonic -> noiseMaker harmonic (toNumber harmonic * nf2f state.frequency))
+      <$> max 1 (ceil (lower / nf2f state.frequency))
+          .. floor (upper / nf2f state.frequency)
   where
     noiseMaker :: Int -> Frequency -> Html
     noiseMaker harmonic freq =
@@ -214,7 +151,95 @@ render state@{ accDisplay } =
         (Proxy :: _ "noiseMaker")
         freq
         SoundButton.soundButton
-        { accDisplay, freq, harmonic }
+        { accDisplay: state.accDisplay, freq, harmonic }
+
+sidebar :: { state :: State, upper :: Number, lower :: Number } -> Html
+sidebar { state, upper, lower } =
+  H.div [ class' "c4c" ]
+  $ [ volume
+    , accidentalDisplay
+    ]
+    <> frequencyType
+    <> bounds
+  where
+    volume :: Html
+    volume =
+      numberInput
+        { label: "Volume"
+        , min: Just 0.0
+        , max: Just 1000.0
+        , value: state.volume
+        }
+        SetVolume
+
+    accidentalDisplay :: Html
+    accidentalDisplay =
+      H.select [ E.onValueInput SetAccDisplay, P.style "width: fit-content;" ]
+        [ H.option [ P.selected $ state.accDisplay == Note.Sharp ]
+            [ H.text "Sharps" ]
+        , H.option [ P.selected $ state.accDisplay == Note.Flat ]
+            [ H.text "Flats" ]
+        , H.option [ P.selected $ state.accDisplay == Note.Both ]
+            [ H.text "Both" ]
+        ]
+
+    frequencyType :: Array Html
+    frequencyType =
+      [ H.div_
+          [ H.label [ P.for "freq-type" ] [ H.text "Frequency Type: " ]
+          , H.select [ P.id "freq-type", E.onValueInput SetFreqMode ]
+              [ H.option_ [ H.text "Notes" ]
+              , H.option_ [ H.text "Manual" ]
+              ]
+          ]
+      , case state.freqMode of
+          Manual ->
+            numberInput
+              { label: "Base Frequency"
+              , min: Just 10.0
+              , max: Nothing
+              , value: nf2f state.frequency
+              }
+              SetFrequency
+          Notes ->
+            H.div_
+              [ H.select [ P.id "note-picker", E.onValueInput SetNote ]
+                $ enumFromTo Note.C Note.B
+                  <#> \n ->
+                        H.option
+                          [ P.value $ show n
+                          , P.selected $ n == getNote state
+                          ]
+                          [ H.text $ Note.display state.accDisplay n ]
+              , H.text " "
+              , numberInput'
+                  { label: ""
+                  , min: Just 0.0
+                  , max: Nothing
+                  , value: toNumber $ getOctave state
+                  }
+                  (SetOctave <. round)
+                  "octave"
+              ]
+      ]
+
+    bounds :: Array Html
+    bounds =
+      [ numberInput
+          { label: "Lower Bound"
+          , min: Just 0.0
+          , max: Nothing
+          , value: lower
+          }
+          SetLower
+      , numberInput
+          { label: "Upper Bound"
+          , min: Just 0.0
+          , max: Nothing
+          , value: upper
+          }
+          SetUpper
+      ]
 
     numberInput :: NumberInput.Input -> (NumberInput.Output -> Action) -> Html
     numberInput input handle = numberInput' input handle input.label
