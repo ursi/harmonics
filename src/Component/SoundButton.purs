@@ -47,6 +47,7 @@ data Action
   = Start
   | Stop
   | UpdateAccDisplay AccDisplay
+  | PreventDefault Event
 
 handleAction :: ∀ o m.
   MonadAsk Config m =>
@@ -72,6 +73,7 @@ handleAction action = do
         Nothing -> pure unit
 
     UpdateAccDisplay ad -> Hal.modify_ _ { accDisplay = ad }
+    PreventDefault e -> liftEffect $ preventDefault e
 
 render :: ∀ m. State -> ComponentHTML Action () m
 render state =
@@ -83,6 +85,7 @@ render state =
     , E.onMouseUp \_ -> Stop
     , E.onTouchEnd \_ -> Stop
     , E.onMouseLeave \_ -> Stop
+    , handler "contextmenu" PreventDefault
     ]
     [ vCenter
       $ H.div_

@@ -32,7 +32,7 @@ import Halogen (Component, ComponentHTML, HalogenM, SubscriptionId) as Exports
 import Halogen.VDom.Driver (runUI) as Exports
 import Halogen.HTML (HTML) as Exports
 import Halogen.HTML.Properties (IProp) as Exports
-import Web.Event.Event (preventDefault) as Exports
+import Web.Event.Event (Event, preventDefault) as Exports
 import Web.UIEvent.MouseEvent (MouseEvent) as Exports
 
 import MasonPrelude
