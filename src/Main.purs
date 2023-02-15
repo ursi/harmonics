@@ -45,6 +45,8 @@ data FreqMode
 
 type NoteFreq = Either Frequency Spn
 
+type Html = ComponentHTML Action Slots AppM
+
 nf2f :: NoteFreq -> Frequency
 nf2f =
   case _ of
@@ -123,7 +125,7 @@ handleAction action = do
     NOP -> pure unit
 
 
-render :: State -> ComponentHTML Action Slots AppM
+render :: State -> Html
 render state@{ accDisplay } =
   let
     lower :: Frequency
@@ -206,7 +208,7 @@ render state@{ accDisplay } =
               .. floor (upper / nf2f state.frequency)
     ]
   where
-    noiseMaker :: Int -> Frequency -> ComponentHTML Action Slots AppM
+    noiseMaker :: Int -> Frequency -> Html
     noiseMaker harmonic freq =
       H.slot_
         (Proxy :: _ "noiseMaker")
@@ -214,17 +216,14 @@ render state@{ accDisplay } =
         SoundButton.soundButton
         { accDisplay, freq, harmonic }
 
-    numberInput ::
-      NumberInput.Input
-      -> (NumberInput.Output -> Action)
-      -> ComponentHTML Action Slots AppM
+    numberInput :: NumberInput.Input -> (NumberInput.Output -> Action) -> Html
     numberInput input handle = numberInput' input handle input.label
 
     numberInput' ::
       NumberInput.Input
       -> (NumberInput.Output -> Action)
       -> String
-      -> ComponentHTML Action Slots AppM
+      -> Html
     numberInput' input handle id =
       H.slot
         (Proxy :: _ "numberInput")
