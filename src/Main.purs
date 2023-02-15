@@ -36,7 +36,6 @@ data Action
   | SetNote String
   | SetOctave Int
   | SetAccDisplay String
-  | NOP
 
 data FreqMode
   = Manual
@@ -121,8 +120,6 @@ handleAction action = do
         "Flats" -> Hal.modify_ _ { accDisplay = Note.Flat }
         "Both" -> Hal.modify_ _ { accDisplay = Note.Both }
         _ -> pure unit
-    NOP -> pure unit
-
 
 render :: State -> Html
 render state =
