@@ -79,7 +79,7 @@ render :: ∀ m. State -> ComponentHTML Action () m
 render state =
   H.div
     [ class' "c2c"
-    , E.onMouseDown \_ -> Start
+    , onLeftMouseDown \_ -> Start
     , E.onTouchStart \_ -> Start
     , E.onMouseEnter \e -> if MouseEvent.buttons e == 1 then Start else Stop
     , E.onMouseUp \_ -> Stop
