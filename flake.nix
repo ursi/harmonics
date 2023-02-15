@@ -29,6 +29,7 @@
                      ursi.prelude
                      web-events
                      web-html
+                     web-uievents
                    ];
 
                  dir = ./.;

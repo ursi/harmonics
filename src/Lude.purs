@@ -7,6 +7,8 @@ module Lude
   , handler'
   , modToEnum
   , numberToString
+  , onLeftMouseDown
+  , onRightMouseDown
   , stringToNumber
   , vCenter
   )
@@ -31,6 +33,7 @@ import Halogen.VDom.Driver (runUI) as Exports
 import Halogen.HTML (HTML) as Exports
 import Halogen.HTML.Properties (IProp) as Exports
 import Web.Event.Event (preventDefault) as Exports
+import Web.UIEvent.MouseEvent (MouseEvent) as Exports
 
 import MasonPrelude
 import Data.Enum (class BoundedEnum, Cardinality(..), cardinality, toEnum)
@@ -44,6 +47,8 @@ import Halogen.HTML.Properties (IProp)
 import Halogen.HTML.Properties as P
 import Partial.Unsafe (unsafePartial)
 import Web.Event.Event (Event, EventType(..))
+import Web.UIEvent.MouseEvent (MouseEvent)
+import Web.UIEvent.MouseEvent as MouseEvent
 
 foreign import numberToString :: Number -> String
 foreign import stringToNumberImpl :: String -> Nullable Number
@@ -72,3 +77,20 @@ handler = E.handler <. EventType
 
 handler' :: ∀ r i. String -> (Event -> Maybe i) -> IProp r i
 handler' = E.handler' <. EventType
+
+onLeftMouseDown :: ∀ r i. (MouseEvent -> i) -> IProp r i
+onLeftMouseDown = customMouseDown 1
+
+onRightMouseDown :: ∀ r i. (MouseEvent -> i) -> IProp r i
+onRightMouseDown = customMouseDown 2
+
+customMouseDown :: ∀ r i. Int -> (MouseEvent -> i) -> IProp r i
+customMouseDown buttons f =
+  handler'
+    "mousedown"
+    (\e -> do
+       me <- MouseEvent.fromEvent e
+       if MouseEvent.buttons me == buttons
+       then pure $ f me
+       else Nothing
+    )
