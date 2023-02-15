@@ -1,4 +1,4 @@
-module Main where
+module Main (main) where
 
 import Lude
 
@@ -256,13 +256,6 @@ sidebar { state, upper, lower } =
         NumberInput.numberInput
         input
         handle
-
-labledInput :: ∀ m.
-  String ->
-  Array (IProp HTMLinput Action) ->
-  ComponentHTML Action Slots m
-labledInput label props =
-  H.label_ [ H.text $ label <> ": ", H.input props ]
 
 getNote :: State -> Note
 getNote state =
