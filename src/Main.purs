@@ -183,7 +183,7 @@ sidebar { state, bottomHarmonic, topHarmonic } =
   where
     volume :: Html
     volume =
-      numberInput
+      numberInput4
         { label: "Volume"
         , min: Just 0.0
         , max: Just 1000.0
@@ -231,7 +231,7 @@ sidebar { state, bottomHarmonic, topHarmonic } =
                           ]
                           [ H.text $ Note.display state.accDisplay n ]
               , H.text " "
-              , numberInput'
+              , numberInput' "c9c"
                   { label: ""
                   , min: Just 0.0
                   , max: Nothing
@@ -244,14 +244,14 @@ sidebar { state, bottomHarmonic, topHarmonic } =
 
     bounds :: Array Html
     bounds =
-      [ numberInput
+      [ numberInput4
           { label: "Lower Bound"
           , min: Just 0.0
           , max: Nothing
           , value: fst state.bounds
           }
           SetLower
-      , numberInput
+      , numberInput4
           { label: "Upper Bound"
           , min: Just 0.0
           , max: Nothing
@@ -278,20 +278,26 @@ sidebar { state, bottomHarmonic, topHarmonic } =
           state.excluded
 
     numberInput :: NumberInput.Input -> (NumberInput.Output -> Action) -> Html
-    numberInput input handle = numberInput' input handle input.label
+    numberInput input handle = numberInput' "" input handle input.label
+
+    numberInput4 :: NumberInput.Input -> (NumberInput.Output -> Action) -> Html
+    numberInput4 input handle = numberInput' "c8c" input handle input.label
 
     numberInput' ::
-      NumberInput.Input
+      String
+      -> NumberInput.Input
       -> (NumberInput.Output -> Action)
       -> String
       -> Html
-    numberInput' input handle id =
-      H.slot
-        (Proxy :: _ "numberInput")
-        id
-        NumberInput.numberInput
-        input
-        handle
+    numberInput' class'' input handle id =
+      H.span [ class' class'' ]
+        [ H.slot
+            (Proxy :: _ "numberInput")
+            id
+            NumberInput.numberInput
+            input
+            handle
+        ]
 
 getNote :: State -> Note
 getNote state =

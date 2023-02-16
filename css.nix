@@ -2,6 +2,7 @@
   let
     inherit (css-lib) merge;
     vars = css-lib.make-var-values config;
+    desc = elem: styles: { extra-rules = c: { "${c} ${elem}" = styles; }; };
   in
   { variables =
       { font-size1 = "21px";
@@ -60,6 +61,7 @@
 
         c4c =
           { display = "grid";
+            width = "13em";
 
             extra-rules = c:
               { "${c} > *".margin-bottom = "1em"; };
@@ -85,5 +87,8 @@
                 user-select = "none";
               }
             ];
+
+        c8c = desc "input" { width = "2.3em"; };
+        c9c = desc "input" { width = ".7em"; };
       };
   }
