@@ -139,7 +139,7 @@ render state =
 
     topHarmonic :: Int
     topHarmonic =
-      floor $ snd state.bounds / nf2f state.frequency
+      max 1 $ floor $ snd state.bounds / nf2f state.frequency
   in
   H.div [ class' "c5c" ]
     [ sidebar { state, bottomHarmonic, topHarmonic }
