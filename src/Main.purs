@@ -9,8 +9,11 @@ import Audio.Oscillator (Frequency)
 import Config (AppM)
 import Component.NumberInput as NumberInput
 import Component.SoundButton as SoundButton
-import Data.Array ((..))
+import Data.Array ((..), (:))
+import Data.Array as Array
 -- import Debug as Debug
+import Data.Set (Set)
+import Data.Set as Set
 import Halogen as Hal
 import Halogen.Aff as HA
 import Halogen.HTML as H
@@ -25,6 +28,7 @@ type State =
   , volume :: Number
   , accDisplay :: AccDisplay
   , freqMode :: FreqMode
+  , excluded :: Set Int
   }
 
 data Action
@@ -36,6 +40,8 @@ data Action
   | SetNote String
   | SetOctave Int
   | SetAccDisplay String
+  | ExcludeHarmonic Int
+  | UnexcludeHarmonic Int
 
 data FreqMode
   = Manual
@@ -78,6 +84,7 @@ parent volume =
         , freqMode: Notes
         , volume
         , accDisplay: Note.Sharp
+        , excluded: mempty
         }
     , render
     , eval: Hal.mkEval $ Hal.defaultEval { handleAction = handleAction }
@@ -120,44 +127,59 @@ handleAction action = do
         "Flats" -> Hal.modify_ _ { accDisplay = Note.Flat }
         "Both" -> Hal.modify_ _ { accDisplay = Note.Both }
         _ -> pure unit
+    ExcludeHarmonic i -> Hal.modify_ _ { excluded = Set.insert i state.excluded }
+    UnexcludeHarmonic i -> Hal.modify_ _ { excluded = Set.delete i state.excluded }
 
 render :: State -> Html
 render state =
   let
-    lower :: Frequency
-    lower = fst state.bounds
+    bottomHarmonic :: Int
+    bottomHarmonic =
+      max 1 $ ceil $ fst state.bounds / nf2f state.frequency
 
-    upper :: Frequency
-    upper = snd state.bounds
+    topHarmonic :: Int
+    topHarmonic =
+      floor $ snd state.bounds / nf2f state.frequency
   in
   H.div [ class' "c5c" ]
-    [ sidebar { state, upper, lower }
-    , harmonicsPanel { state, upper, lower }
+    [ sidebar { state, bottomHarmonic, topHarmonic }
+    , harmonicsPanel { state, bottomHarmonic, topHarmonic }
     ]
 
-harmonicsPanel :: { state :: State, upper :: Number, lower :: Number } -> Html
-harmonicsPanel { state, upper, lower } =
+harmonicsPanel ::
+  { state :: State
+  , bottomHarmonic :: Int
+  , topHarmonic :: Int
+  }
+  -> Html
+harmonicsPanel { state, bottomHarmonic, topHarmonic } =
   H.div [ class' "c1c" ]
-    $ (\harmonic -> noiseMaker harmonic (toNumber harmonic * nf2f state.frequency))
-      <$> max 1 (ceil (lower / nf2f state.frequency))
-          .. floor (upper / nf2f state.frequency)
+    $ bottomHarmonic .. topHarmonic
+      # Array.filter (not <. Set.member ~$ state.excluded)
+      <#> (\harmonic ->
+             noiseMaker harmonic (toNumber harmonic * nf2f state.frequency)
+          )
   where
     noiseMaker :: Int -> Frequency -> Html
     noiseMaker harmonic freq =
-      H.slot_
-        (Proxy :: _ "noiseMaker")
-        freq
-        SoundButton.soundButton
-        { accDisplay: state.accDisplay, freq, harmonic }
+      H.div [ onRightMouseDown \_ -> ExcludeHarmonic harmonic ]
+        [ H.slot_
+            (Proxy :: _ "noiseMaker")
+            freq
+            SoundButton.soundButton
+            { accDisplay: state.accDisplay, freq, harmonic }
+        ]
 
-sidebar :: { state :: State, upper :: Number, lower :: Number } -> Html
-sidebar { state, upper, lower } =
+sidebar :: { state :: State, bottomHarmonic :: Int, topHarmonic :: Int } -> Html
+sidebar { state, bottomHarmonic, topHarmonic } =
   H.div [ class' "c4c" ]
   $ [ volume
     , accidentalDisplay
     ]
     <> frequencyType
     <> bounds
+    <>
+    [ excludedHarmonics ]
   where
     volume :: Html
     volume =
@@ -226,17 +248,34 @@ sidebar { state, upper, lower } =
           { label: "Lower Bound"
           , min: Just 0.0
           , max: Nothing
-          , value: lower
+          , value: fst state.bounds
           }
           SetLower
       , numberInput
           { label: "Upper Bound"
           , min: Just 0.0
           , max: Nothing
-          , value: upper
+          , value: snd state.bounds
           }
           SetUpper
       ]
+
+    excludedHarmonics :: Html
+    excludedHarmonics =
+      H.div [ class' "c6c" ]
+      $ foldr
+          (\harmonic acc ->
+             if between bottomHarmonic topHarmonic harmonic then
+               H.div
+                 [ class' "c7c"
+                 , E.onClick \_-> UnexcludeHarmonic harmonic
+                 ]
+                 [ H.text $ show harmonic ] : acc
+             else
+               acc
+          )
+          []
+          state.excluded
 
     numberInput :: NumberInput.Input -> (NumberInput.Output -> Action) -> Html
     numberInput input handle = numberInput' input handle input.label

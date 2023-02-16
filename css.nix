@@ -1,5 +1,6 @@
 { config, css-lib, ...}:
   let
+    inherit (css-lib) merge;
     vars = css-lib.make-var-values config;
   in
   { variables =
@@ -22,6 +23,7 @@
       };
 
     classes."1" =
+      rec
       { center =
           { width = "100%";
             height = "100%";
@@ -67,5 +69,21 @@
           { display = "flex";
             align-items = "start";
           };
+
+        c6c =
+          { display = "grid";
+            grid-template-columns = "repeat(8, 1.4em)";
+            gap = ".1em";
+          };
+
+        c7c =
+          merge
+            [ center
+              { color = "black";
+                background = "#873333";
+                border-radius = ".15em";
+                user-select = "none";
+              }
+            ];
       };
   }

@@ -22,6 +22,7 @@
                      integers
                      nullable
                      numbers
+                     ordered-collections
                      record
                      safe-coerce
                      transformers
