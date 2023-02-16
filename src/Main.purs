@@ -162,7 +162,7 @@ harmonicsPanel { state, bottomHarmonic, topHarmonic } =
   where
     noiseMaker :: Int -> Frequency -> Html
     noiseMaker harmonic freq =
-      H.div [ onRightMouseDown \_ -> ExcludeHarmonic harmonic ]
+      H.div [ onRightMouseUp \_ -> ExcludeHarmonic harmonic ]
         [ H.slot_
             (Proxy :: _ "noiseMaker")
             freq

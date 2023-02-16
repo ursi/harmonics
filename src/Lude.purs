@@ -9,6 +9,7 @@ module Lude
   , numberToString
   , onLeftMouseDown
   , onRightMouseDown
+  , onRightMouseUp
   , stringToNumber
   , vCenter
   )
@@ -84,6 +85,9 @@ onLeftMouseDown = customMouseDown 1
 onRightMouseDown :: ∀ r i. (MouseEvent -> i) -> IProp r i
 onRightMouseDown = customMouseDown 2
 
+onRightMouseUp :: ∀ r i. (MouseEvent -> i) -> IProp r i
+onRightMouseUp = customMouseUp 2
+
 customMouseDown :: ∀ r i. Int -> (MouseEvent -> i) -> IProp r i
 customMouseDown buttons f =
   handler'
@@ -91,6 +95,17 @@ customMouseDown buttons f =
     (\e -> do
        me <- MouseEvent.fromEvent e
        if MouseEvent.buttons me == buttons
+       then pure $ f me
+       else Nothing
+    )
+
+customMouseUp :: ∀ r i. Int -> (MouseEvent -> i) -> IProp r i
+customMouseUp buttons f =
+  handler'
+    "mouseup"
+    (\e -> do
+       me <- MouseEvent.fromEvent e
+       if MouseEvent.button me == buttons
        then pure $ f me
        else Nothing
     )
