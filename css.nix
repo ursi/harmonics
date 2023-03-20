@@ -24,6 +24,11 @@
       };
 
     classes."1" =
+      let
+        soundButtonSize = 112;
+        soundButtonMargin = 15;
+        soundButtonGridColumns = 8;
+      in
       rec
       { center =
           { width = "100%";
@@ -34,19 +39,24 @@
           };
 
         c1c =
-          { display = "grid";
-            grid-template-columns = "repeat(8, min-content)";
+          { display = "flex";
+            flex-wrap = "wrap";
+            max-width =
+              toString
+                (soundButtonGridColumns
+                 * (soundButtonSize + 2 * soundButtonMargin)
+                )
+                + "px";
             user-select = "none";
             white-space = "pre";
           };
 
         c2c =
-          { "--size" = "112px";
-            color = "black";
-            width = "var(--size)";
-            height = "var(--size)";
+          { color = "black";
+            width = toString soundButtonSize + "px";
+            height = toString soundButtonSize + "px";
             background = vars.gray1;
-            margin = "15px";
+            margin = toString soundButtonMargin + "px";
             text-align = "center";
           };
 
