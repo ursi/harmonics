@@ -13,24 +13,22 @@
            ps =
              purs-nix.purs
                { dependencies =
-                   let inherit (purs-nix.ps-pkgs-ns) ursi; in
-                   with purs-nix.ps-pkgs;
-                   [ aff
-                     datetime
-                     enums
-                     halogen
-                     integers
-                     nullable
-                     numbers
-                     ordered-collections
-                     record
-                     safe-coerce
-                     transformers
-                     partial
-                     ursi.prelude
-                     web-events
-                     web-html
-                     web-uievents
+                   [ "aff"
+                     "datetime"
+                     "enums"
+                     "halogen"
+                     "integers"
+                     "nullable"
+                     "numbers"
+                     "ordered-collections"
+                     "record"
+                     "safe-coerce"
+                     "transformers"
+                     "partial"
+                     "ursi.prelude"
+                     "web-events"
+                     "web-html"
+                     "web-uievents"
                    ];
 
                  dir = ./.;
