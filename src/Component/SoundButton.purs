@@ -65,7 +65,7 @@ handleAction action = do
             state.freq
             config.gainNode
             config.audioContext
-      Hal.modify_ \s -> s { oscillator = Just osc }
+      Hal.modify_ _ { oscillator = Just osc }
 
     Stop ->
       case state.oscillator of
