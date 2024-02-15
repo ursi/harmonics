@@ -34,7 +34,7 @@ soundButton =
         Hal.mkEval
         $ Hal.defaultEval
             { handleAction = handleAction
-            , receive = Just <. UpdateAccDisplay <. _.accDisplay
+            , receive = Just <. UpdateInput
             }
     }
 
@@ -46,7 +46,7 @@ type State =
 data Action
   = Start
   | Stop
-  | UpdateAccDisplay AccDisplay
+  | UpdateInput Input
   | PreventDefault Event
 
 handleAction :: ∀ o m.
@@ -72,7 +72,7 @@ handleAction action = do
         Just osc -> liftEffect $ Oscillator.stop osc
         Nothing -> pure unit
 
-    UpdateAccDisplay ad -> Hal.modify_ _ { accDisplay = ad }
+    UpdateInput i -> Hal.modify_ $ Record.merge i
     PreventDefault e -> liftEffect $ preventDefault e
 
 render :: ∀ m. State -> ComponentHTML Action () m
