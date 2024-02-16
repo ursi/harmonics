@@ -10,6 +10,7 @@
     inputs.utils.apply-systems { inherit inputs; }
       ({ nix-css, pkgs, purs-nix, ps-tools, ... }:
          let
+           p = pkgs;
            ps =
              purs-nix.purs
                { dependencies =
@@ -41,9 +42,9 @@
              };
 
            devShells.default =
-             pkgs.mkShell
+             p.mkShell
                { packages =
-                   with pkgs;
+                   with p;
                    [ entr
                      nodejs
                      (ps.command { bundle.esbuild.format = "iife"; })
