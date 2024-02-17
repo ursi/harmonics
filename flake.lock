@@ -205,6 +205,39 @@
       }
     },
     "flake-utils_4": {
+      "inputs": {
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1694529238,
+        "narHash": "sha256-zsNZZGTGnMOf9YpHKJqMSsa0dXbfmxeoJ7xHlrt+xmY=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "ff7b65b44d01cf9ba6a71320833626af21126384",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "flake-utils_5": {
+      "locked": {
+        "lastModified": 1644229661,
+        "narHash": "sha256-1YdnJAsNy69bpcjuoKdOYQX0YxZBiCYZo4Twxerqv7k=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "3cecb5b042f7f209c56ffd8371b2711a290ec797",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "flake-utils_6": {
       "locked": {
         "lastModified": 1667395993,
         "narHash": "sha256-nuEHfE/LcWyuSWnS8t12N1wc105Qtau+/OdUAjtQ0rA=",
@@ -253,6 +286,28 @@
       "original": {
         "owner": "hercules-ci",
         "repo": "gitignore.nix",
+        "type": "github"
+      }
+    },
+    "lint-utils": {
+      "inputs": {
+        "flake-utils": "flake-utils_5",
+        "nixpkgs": [
+          "shelpers",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1707777931,
+        "narHash": "sha256-PsPb5xMBZ9dPDP04o9vqKEUIEG80Z84/74fPuOMs0ZI=",
+        "owner": "homotopic",
+        "repo": "lint-utils",
+        "rev": "5f11e3e51d8f1aa4ed62a89e90f05953931e105a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "homotopic",
+        "repo": "lint-utils",
         "type": "github"
       }
     },
@@ -471,6 +526,22 @@
         "type": "github"
       }
     },
+    "nixpkgs_15": {
+      "locked": {
+        "lastModified": 1707743206,
+        "narHash": "sha256-AehgH64b28yKobC/DAWYZWkJBxL/vP83vkY+ag2Hhy4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "2d627a2a704708673e56346fcb13d25344b8eaf3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1645013224,
@@ -663,6 +734,7 @@
           "ps-tools"
         ],
         "purs-nix": "purs-nix",
+        "shelpers": "shelpers",
         "utils": "utils_7"
       }
     },
@@ -734,6 +806,26 @@
         "type": "github"
       }
     },
+    "shelpers": {
+      "inputs": {
+        "flake-utils": "flake-utils_4",
+        "lint-utils": "lint-utils",
+        "nixpkgs": "nixpkgs_15"
+      },
+      "locked": {
+        "lastModified": 1708015981,
+        "narHash": "sha256-7QwDi9lxCTHM8cF+ITEoRGHgha/UGCPl5Mpy5XFTwOU=",
+        "owner": "platonic",
+        "repo": "shelpers",
+        "rev": "b4cca46364d8274261755487765e69b8ddc76c5f",
+        "type": "gitlab"
+      },
+      "original": {
+        "owner": "platonic",
+        "repo": "shelpers",
+        "type": "gitlab"
+      }
+    },
     "statix": {
       "inputs": {
         "fenix": "fenix_4",
@@ -751,6 +843,21 @@
       "original": {
         "owner": "nerdypepper",
         "repo": "statix",
+        "type": "github"
+      }
+    },
+    "systems": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
         "type": "github"
       }
     },
@@ -858,7 +965,7 @@
     },
     "utils_7": {
       "inputs": {
-        "flake-utils": "flake-utils_4"
+        "flake-utils": "flake-utils_6"
       },
       "locked": {
         "lastModified": 1658606827,

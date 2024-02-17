@@ -3,6 +3,7 @@
       nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
       ps-tools.follows = "purs-nix/ps-tools";
       purs-nix.url = "github:purs-nix/purs-nix/ps-0.15";
+      shelpers.url = "gitlab:platonic/shelpers";
       utils.url = "github:ursi/flake-utils/8";
     };
 
@@ -35,6 +36,21 @@
                  dir = ./.;
                };
            css = (nix-css ./css.nix).bundle;
+           inherit (inputs.shelpers.lib p) eval-shelpers shelp;
+
+           shelpers =
+             eval-shelpers
+               [ ({ config, ... }:
+                    { shelpers.".".General =
+                        { watch =
+                            { description = "build the app and watch for changes";
+                              script = "ls **/*.{purs,js,nix} | entr -s 'echo bundling; purs-nix bundle; nix build .#css; ln -fs result/main.css .'";
+                            };
+
+                          shelp = shelp config;
+                        };
+                    })
+               ];
          in
          { packages =
              { inherit css;
@@ -55,9 +71,13 @@
 
                  shellHook =
                    ''
-                   alias watch="ls **/*.{purs,js,nix} | entr -s 'echo bundling; purs-nix bundle; nix build .#css; ln -fs result/main.css .'"
+                   ${shelpers.functions}
+                   shelp
                    '';
                };
+
+           inherit (shelpers) apps;
+           shelpers = shelpers.files;
          }
       );
 }
