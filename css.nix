@@ -58,6 +58,7 @@
             background = vars.gray1;
             margin = toString soundButtonMargin + "px";
             text-align = "center";
+            border-radius = "4px";
           };
 
         c3c =
