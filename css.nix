@@ -1,6 +1,7 @@
 { config, css-lib, ...}:
   let
     inherit (css-lib) merge;
+    inherit (css-lib.media) geq;
     vars = css-lib.make-var-values config;
     desc = elem: styles: { extra-rules = c: { "${c} ${elem}" = styles; }; };
   in
@@ -79,7 +80,7 @@
           };
 
         c5c =
-          { display = "flex";
+          { ${geq 707}.display = "flex";
             align-items = "start";
           };
 
