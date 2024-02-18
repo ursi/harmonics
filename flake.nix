@@ -35,6 +35,7 @@
 
                  dir = ./.;
                };
+
            css = (nix-css ./css.nix).bundle;
            inherit (inputs.shelpers.lib p) eval-shelpers shelp;
 
