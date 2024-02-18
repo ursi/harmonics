@@ -60,6 +60,7 @@
             margin = toString soundButtonMargin + "px";
             text-align = "center";
             border-radius = "4px";
+            cursor = "pointer";
           };
 
         c3c =
