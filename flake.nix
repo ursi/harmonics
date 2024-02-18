@@ -9,9 +9,11 @@
 
   outputs = { ... }@inputs:
     inputs.utils.apply-systems { inherit inputs; }
-      ({ nix-css, pkgs, purs-nix, ps-tools, ... }:
+      ({ nix-css, pkgs, purs-nix, ps-tools, system, ... }:
          let
            p = pkgs;
+           packages = inputs.self.packages.${system};
+
            ps =
              purs-nix.purs
                { dependencies =
@@ -62,8 +64,17 @@
                ];
          in
          { packages =
-             { inherit css;
-               default = ps.bundle {};
+             { default =
+                 p.runCommand "harmonics" {}
+                   ''
+                   mkdir $out; cd $_
+                   ln -s ${./index.html} index.html
+                   ln -s ${packages.bundle} main.js
+                   ln -s ${packages.css}/main.css .
+                   '';
+
+               inherit css;
+               bundle = ps.bundle { esbuild.format = "iife"; };
              };
 
            devShells.default =
