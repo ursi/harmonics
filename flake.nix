@@ -45,7 +45,27 @@
              eval-shelpers
                [ ({ config, ... }:
                     { shelpers.".".General =
-                        { watch =
+                        { deploy =
+                            { description = "deploy to github pages";
+                              cache = false;
+                              script =
+                                ''
+                                git checkout -B pages
+                                rm docs -rf
+
+                                # the only custom directory gh pages allows you to deploy from
+                                mkdir docs
+
+                                echo '!docs/*' >> .gitignore
+                                cp -Lr --no-preserve=mode ${packages.default}/. docs
+                                git add .gitignore docs
+                                git commit -m "github pages"
+                                git push -fu origin pages
+                                git co master
+                                '';
+                            };
+
+                          watch =
                             { description = "build the app and watch for changes";
                               script =
                                 ''
