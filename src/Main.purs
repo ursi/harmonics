@@ -21,6 +21,7 @@ import Halogen.HTML.Events as E
 import Halogen.HTML.Properties as P
 import Note (AccDisplay, Note (..), Spn)
 import Note as Note
+import Substitute (normalize)
 
 type State =
   { frequency :: NoteFreq
@@ -29,6 +30,7 @@ type State =
   , accDisplay :: AccDisplay
   , freqMode :: FreqMode
   , excluded :: Set Int
+  , showingInstructions :: Boolean
   }
 
 data Action
@@ -42,6 +44,7 @@ data Action
   | SetAccDisplay String
   | ExcludeHarmonic Int
   | UnexcludeHarmonic Int
+  | ToggleInstructions
 
 data FreqMode
   = Manual
@@ -85,6 +88,7 @@ parent volume =
         , volume
         , accDisplay: Note.Sharp
         , excluded: mempty
+        , showingInstructions: false
         }
     , render
     , eval: Hal.mkEval $ Hal.defaultEval { handleAction = handleAction }
@@ -129,6 +133,8 @@ handleAction action = do
         _ -> pure unit
     ExcludeHarmonic i -> Hal.modify_ _ { excluded = Set.insert i state.excluded }
     UnexcludeHarmonic i -> Hal.modify_ _ { excluded = Set.delete i state.excluded }
+    ToggleInstructions ->
+      Hal.modify_ \s -> s { showingInstructions = not s.showingInstructions }
 
 render :: State -> Html
 render state =
@@ -142,8 +148,24 @@ render state =
       max 1 $ floor $ snd state.bounds / nf2f state.frequency
   in
   H.div [ class' "c5c" ]
-    [ sidebar { state, bottomHarmonic, topHarmonic }
-    , harmonicsPanel { state, bottomHarmonic, topHarmonic }
+    [ H.h1 [ class' "c10c" ] [ H.text "Use desktop for a better experience." ]
+    , sidebar { state, bottomHarmonic, topHarmonic }
+    , if state.showingInstructions
+      then instructions
+      else harmonicsPanel { state, bottomHarmonic, topHarmonic }
+    ]
+
+instructions :: Html
+instructions =
+  H.div
+    [ class' "c12c" ]
+    [ H.text
+      $ normalize
+          """
+          Click to play notes
+          Right click to hide notes
+          Click the tiny hidden notes to bring them back
+          """
     ]
 
 harmonicsPanel ::
@@ -178,8 +200,9 @@ sidebar { state, bottomHarmonic, topHarmonic } =
     ]
     <> frequencyType
     <> bounds
-    <>
-    [ excludedHarmonics ]
+    <> [ instructionsButton state.showingInstructions
+       , excludedHarmonics
+       ]
   where
     volume :: Html
     volume =
@@ -259,6 +282,18 @@ sidebar { state, bottomHarmonic, topHarmonic } =
           }
           SetUpper
       ]
+
+    instructionsButton :: Boolean -> Html
+    instructionsButton showingInstructions =
+      H.div
+        [ class' "c11c"
+        , E.onClick \_ -> ToggleInstructions
+        ]
+        [ H.text
+            if showingInstructions
+            then "Harmonics"
+            else "Instructions"
+        ]
 
     excludedHarmonics :: Html
     excludedHarmonics =

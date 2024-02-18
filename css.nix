@@ -102,5 +102,23 @@
 
         c8c = desc "input" { width = "2.3em"; };
         c9c = desc "input" { width = ".7em"; };
+
+        c10c =
+         { ${geq 457}.display = "none";
+           color = "red";
+           font-size = "1rem";
+         };
+
+        c11c =
+          { background = vars.gray1;
+            color = "black";
+            padding = "6px";
+            text-align = "center";
+            border-radius = "4px";
+            cursor = "pointer";
+            user-select = "none";
+          };
+
+        c12c.white-space = "pre-wrap";
       };
   }

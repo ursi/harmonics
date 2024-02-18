@@ -27,6 +27,7 @@
                      "ordered-collections"
                      "record"
                      "safe-coerce"
+                     "substitute"
                      "transformers"
                      "partial"
                      "ursi.prelude"
