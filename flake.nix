@@ -44,7 +44,15 @@
                     { shelpers.".".General =
                         { watch =
                             { description = "build the app and watch for changes";
-                              script = "ls **/*.{purs,js,nix} | entr -s 'echo bundling; purs-nix bundle; nix build .#css; ln -fs result/main.css .'";
+                              script =
+                                ''
+                                ls **/*.{purs,js,nix} | entr -s '
+                                  echo bundling
+                                  purs-nix bundle
+                                  nix build .#css
+                                  ln -fs result/main.css .
+                                  '
+                                '';
                             };
 
                           shelp = shelp config;
