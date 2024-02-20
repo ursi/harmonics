@@ -10,3 +10,4 @@
 /.spago
 main.css
 main.js
+!docs/*
